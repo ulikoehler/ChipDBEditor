@@ -215,7 +215,7 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
                 if (datasheet.startsWith("\"") && datasheet.endsWith("\"")) {
                     datasheet = datasheet.substring(1, datasheet.length() - 1);
                 }
-                familyField.setText(datasheet);
+                datasheetField.setText(datasheet);
             } else if (line.startsWith("aliases:")) {
                 String aliases = line.substring("aliases:".length()).trim();
                 if (aliases.startsWith("[") && aliases.endsWith("]")) {
@@ -238,7 +238,7 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
                 }
                 line = line.substring("sym:".length()).trim();
                 if (line.startsWith("\"") && line.endsWith("\"")) {
-                    line = line.substring(1, line.length());
+                    line = line.substring(1, line.length() - 1);
                 }
                 String symbol = line;
                 //Parse the description
@@ -250,7 +250,7 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
                 }
                 line = line.substring("desc:".length()).trim();
                 if (line.startsWith("\"") && line.endsWith("\"")) {
-                    line = line.substring(1, line.length());
+                    line = line.substring(1, line.length() - 1);
                 }
                 String description = line;
                 //Insert the data and re-render the table row
@@ -266,7 +266,7 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
                 }
                 line = line.substring("val:".length()).trim();
                 if (line.startsWith("\"") && line.endsWith("\"")) {
-                    line = line.substring(1, line.length());
+                    line = line.substring(1, line.length() - 1);
                 }
                 String value = line;
                 //Parse the description
@@ -278,7 +278,7 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
                 }
                 line = line.substring("unit:".length()).trim();
                 if (line.startsWith("\"") && line.endsWith("\"")) {
-                    line = line.substring(1, line.length());
+                    line = line.substring(1, line.length() - 1);
                 }
                 String unit = line;
                 //Insert the specification
