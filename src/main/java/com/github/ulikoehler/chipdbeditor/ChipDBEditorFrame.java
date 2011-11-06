@@ -5,6 +5,8 @@
  */
 package com.github.ulikoehler.chipdbeditor;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -30,7 +32,7 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
     private NotesTableModel notesTableModel = new NotesTableModel();
     private boolean disableYAMLParsing = false; //Avoid parsing the YAML because of setting the field content when recalculating it
     private boolean disableYAMLRebuild = false; //Avoid rebuilding the YAML when parsing it
-    
+
     private void initPinsTable() {
         pinsTable.setModel(pinTableModel);
         pinsTable.setRowHeight(25);
@@ -84,6 +86,12 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
         datasheetField.getDocument().addDocumentListener(docListener);
         descriptionField.getDocument().addDocumentListener(docListener);
         aliasesField.getDocument().addDocumentListener(docListener);
+        packageComboBox.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                rebuildYAML();
+            }
+        });
         //Parse the YAML when it changed in the field
         yamlField.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -181,31 +189,37 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
             if (line.startsWith("name:")) {
                 String name = line.substring("name:".length()).trim();
                 if (name.startsWith("\"") && name.endsWith("\"")) {
-                    name = name.substring(1, name.length()-1);
+                    name = name.substring(1, name.length() - 1);
                 }
                 partField.setText(name);
             } else if (line.startsWith("description:")) {
                 String description = line.substring("description:".length()).trim();
                 if (description.startsWith("\"") && description.endsWith("\"")) {
-                    description = description.substring(1, description.length()-1);
+                    description = description.substring(1, description.length() - 1);
                 }
                 descriptionField.setText(description);
             } else if (line.startsWith("family:")) {
                 String family = line.substring("family:".length()).trim();
                 if (family.startsWith("\"") && family.endsWith("\"")) {
-                    family = family.substring(1, family.length()-1);
+                    family = family.substring(1, family.length() - 1);
                 }
                 familyField.setText(family);
+            } else if (line.startsWith("package:")) {
+                String packageString = line.substring("package:".length()).trim();
+                if (packageString.startsWith("\"") && packageString.endsWith("\"")) {
+                    packageString = packageString.substring(1, packageString.length() - 1);
+                }
+                packageComboBox.setSelectedItem(packageString);
             } else if (line.startsWith("datasheet:")) {
                 String datasheet = line.substring("datasheet:".length()).trim();
                 if (datasheet.startsWith("\"") && datasheet.endsWith("\"")) {
-                    datasheet = datasheet.substring(1, datasheet.length()-1);
+                    datasheet = datasheet.substring(1, datasheet.length() - 1);
                 }
                 familyField.setText(datasheet);
             } else if (line.startsWith("aliases:")) {
                 String aliases = line.substring("aliases:".length()).trim();
                 if (aliases.startsWith("[") && aliases.endsWith("]")) {
-                    aliases = aliases.substring(1, aliases.length()-1);
+                    aliases = aliases.substring(1, aliases.length() - 1);
                 }
                 aliasesField.setText(aliases);
             } else if (line.startsWith("pincount:")) {
