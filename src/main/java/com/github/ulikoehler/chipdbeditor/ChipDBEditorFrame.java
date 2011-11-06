@@ -150,7 +150,7 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
     private String notesToYAML() {
         StringBuilder yamlBuilder = new StringBuilder("notes:\n");
         for (Map.Entry<Integer, String> entry : notesTableModel.getNotes().entrySet()) {
-            if (entry.getValue() != null || entry.getValue().trim().isEmpty()) {
+            if (entry.getValue() == null || entry.getValue().trim().isEmpty()) {
                 continue; //Don't add empty notes
             }
             yamlBuilder.append("  - \"").append(entry.getValue()).append("\"\n");
@@ -169,10 +169,11 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
             String unit = unitById.get(i) == null ? "" : unitById.get(i);
             String value = valueById.get(i) == null ? "" : valueById.get(i);
             if (param.trim().isEmpty() && unit.trim().isEmpty() && value.trim().isEmpty()) {
+                System.out.println("Continue ");
                 continue; //Don't add empty specs
             }
             yamlBuilder.append("  - param: \"").append(param).append("\"\n");
-            yamlBuilder.append("    val: \"").append(value).append("\"\n");
+            yamlBuilder.append("    val: ").append(value).append("\n");
             yamlBuilder.append("    unit: \"").append(unit).append("\"\n");
         }
         return yamlBuilder.toString();
@@ -256,7 +257,11 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
                 //Insert the data and re-render the table row
                 pinTableModel.addPinData(currentPinCount, symbol, description);
             } else if (line.trim().startsWith("- param:")) {
-                String param = line.trim().substring("- param:".length()).trim();
+                line =  line.trim().substring("- param:".length()).trim();
+                if (line.startsWith("\"") && line.endsWith("\"")) {
+                    line = line.substring(1, line.length() - 1);
+                }
+                String param = line;
                 //Parse the symbol
                 do {
                     line = in.readLine().trim();

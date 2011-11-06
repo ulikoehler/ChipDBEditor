@@ -19,7 +19,7 @@ public class NotesTableModel extends AbstractTableModel {
     public void addNote(String note) {
         int index = getRowCount() - 1;
         notes.put(index, note);
-        fireTableRowsInserted(index, index);
+        fireTableRowsInserted(index-1, index-1);
     }
 
 
@@ -46,7 +46,7 @@ public class NotesTableModel extends AbstractTableModel {
 
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (columnIndex == 0) {
-            return notes.get(rowIndex);
+            return notes.get(rowIndex + 1);
         } else {
             throw new IllegalArgumentException("Illegal column nr: " + columnIndex);
         }
@@ -75,7 +75,7 @@ public class NotesTableModel extends AbstractTableModel {
         }
 
         if (columnIndex == 0) {
-            notes.put(rowIndex, attribute);
+            notes.put(rowIndex + 1, attribute);
         } else {
             throw new IllegalArgumentException("Illegal column nr: " + columnIndex);
         }
