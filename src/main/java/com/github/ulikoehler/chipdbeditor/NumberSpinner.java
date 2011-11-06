@@ -1,4 +1,4 @@
-package uli.chipdbeditor;
+package com.github.ulikoehler.chipdbeditor;
 
 /*
  * NumberSpinner.java

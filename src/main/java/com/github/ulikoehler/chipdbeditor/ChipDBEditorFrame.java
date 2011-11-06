@@ -1,14 +1,9 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * ChipDBEditorFrame.java
  *
  * Created on 04.11.2011, 20:36:04
  */
-package uli.chipdbeditor;
+package com.github.ulikoehler.chipdbeditor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,6 +28,8 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
     private PinTableModel pinTableModel = new PinTableModel();
     private SpecsTableModel specsTableModel = new SpecsTableModel();
     private NotesTableModel notesTableModel = new NotesTableModel();
+    private boolean disableYAMLParsing = false; //Avoid parsing the YAML because of setting the field content when recalculating it
+    private boolean disableYAMLRebuild = false; //Avoid rebuilding the YAML when parsing it
 
     private void initPinsTable() {
         pinsTable.setModel(pinTableModel);
@@ -87,15 +84,47 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
         datasheetField.getDocument().addDocumentListener(docListener);
         descriptionField.getDocument().addDocumentListener(docListener);
         aliasesField.getDocument().addDocumentListener(docListener);
+        //Parse the YAML when it changed in the field
+        yamlField.getDocument().addDocumentListener(new DocumentListener() {
+
+            public void insertUpdate(DocumentEvent e) {
+                try {
+                    parseYAML(yamlField.getText());
+                } catch (IOException ex) {
+                    Logger.getLogger(ChipDBEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            public void removeUpdate(DocumentEvent e) {
+                try {
+                    parseYAML(yamlField.getText());
+                } catch (IOException ex) {
+                    Logger.getLogger(ChipDBEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            public void changedUpdate(DocumentEvent e) {
+                try {
+                    parseYAML(yamlField.getText());
+                } catch (IOException ex) {
+                    Logger.getLogger(ChipDBEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
     }
 
     private void rebuildYAML() {
+        if (disableYAMLRebuild) {
+            return;
+        }
         StringBuilder yamlBuilder = new StringBuilder();
         yamlBuilder.append(headerToYAML());
         yamlBuilder.append(pinsToYAML());
         yamlBuilder.append(specsToYAML());
         yamlBuilder.append(notesToYAML());
+        disableYAMLParsing = true;
         yamlField.setText(yamlBuilder.toString());
+        disableYAMLParsing = false;
     }
 
     private String headerToYAML() {
@@ -113,7 +142,10 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
     private String notesToYAML() {
         StringBuilder yamlBuilder = new StringBuilder("notes:\n");
         for (Map.Entry<Integer, String> entry : notesTableModel.getNotes().entrySet()) {
-            yamlBuilder.append("  - ").append(entry.getValue()).append('\n');
+            if (entry.getValue() != null || entry.getValue().trim().isEmpty()) {
+                continue; //Don't add empty notes
+            }
+            yamlBuilder.append("  - \"").append(entry.getValue()).append("\"\n");
         }
         return yamlBuilder.toString();
     }
@@ -125,86 +157,130 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
         Map<Integer, String> unitById = specsTableModel.getUnitById();
         Map<Integer, String> valueById = specsTableModel.getValueById();
         for (int i = 1; i <= numPins; i++) {
-            String param = paramById.get(i);
-            String unit = unitById.get(i);
-            String value = valueById.get(i);
-            yamlBuilder.append("  - param: ").append(param == null ? "" : param).append('\n');
-            yamlBuilder.append("    val: ").append(param == null ? "" : value).append('\n');
-            yamlBuilder.append("    unit: ").append(param == null ? "" : unit).append('\n');
+            String param = paramById.get(i) == null ? "" : paramById.get(i);
+            String unit = unitById.get(i) == null ? "" : unitById.get(i);
+            String value = valueById.get(i) == null ? "" : valueById.get(i);
+            if (param.trim().isEmpty() && unit.trim().isEmpty() && value.trim().isEmpty()) {
+                continue; //Don't add empty specs
+            }
+            yamlBuilder.append("  - param: \"").append(param).append("\"\n");
+            yamlBuilder.append("    val: \"").append(value).append("\"\n");
+            yamlBuilder.append("    unit: \"").append(unit).append("\"\n");
         }
         return yamlBuilder.toString();
     }
 
     private void parseYAML(String yaml) throws IOException {
+        if (disableYAMLParsing) {
+            return;
+        }
+        disableYAMLRebuild = true;
         BufferedReader in = new BufferedReader(new StringReader(yaml));
         String line = null;
         while ((line = in.readLine()) != null) {
             if (line.startsWith("name: ")) {
                 String name = line.substring("name: ".length()).trim();
                 if (name.startsWith("\"") && name.endsWith("\"")) {
-                    name = name.substring(1, name.length() - 1);
+                    name = name.substring(1, name.length());
                 }
                 partField.setText(name);
             } else if (line.startsWith("description: ")) {
                 String description = line.substring("description: ".length()).trim();
                 if (description.startsWith("\"") && description.endsWith("\"")) {
-                    description = description.substring(1, description.length() - 1);
+                    description = description.substring(1, description.length());
                 }
                 descriptionField.setText(description);
             } else if (line.startsWith("family: ")) {
                 String family = line.substring("family: ".length()).trim();
                 if (family.startsWith("\"") && family.endsWith("\"")) {
-                    family = family.substring(1, family.length() - 1);
+                    family = family.substring(1, family.length());
                 }
                 familyField.setText(family);
             } else if (line.startsWith("datasheet: ")) {
                 String family = line.substring("datasheet: ".length()).trim();
                 if (family.startsWith("\"") && family.endsWith("\"")) {
-                    family = family.substring(1, family.length() - 1);
+                    family = family.substring(1, family.length());
                 }
                 familyField.setText(family);
             } else if (line.startsWith("aliases: ")) {
                 String aliases = line.substring("aliases: ".length()).trim();
                 if (aliases.startsWith("[") && aliases.endsWith("]")) {
-                    aliases = aliases.substring(1, aliases.length() - 1);
+                    aliases = aliases.substring(1, aliases.length());
                 }
                 aliasesField.setText(aliases);
             } else if (line.startsWith("pincount: ")) {
                 String pincountString = line.substring("pincount: ".length()).trim();
                 int pincountInt = Integer.parseInt(pincountString);
                 pinsSpinner.setIntValue(pincountInt);
-            } else if (line.trim().startsWith("- num: ")) {
-                String pincountString = line.trim().substring("-  num: ".length()).trim();
+            } else if (line.trim().startsWith("- num:")) {
+                String pincountString = line.trim().substring("-  num:".length()).trim();
                 int currentPinCount = Integer.parseInt(pincountString);
                 //Parse the symbol
-                line = in.readLine().trim();
-                if(line == null || !line.startsWith("sym: ")) {
-                    JOptionPane.showMessageDialog(this, "Error while parsing sym line: " + line, "Parsing error", JOptionPane.ERROR_MESSAGE);
+                do {
+                    line = in.readLine().trim();
+                } while (line != null && line.isEmpty());
+                if (line == null || !line.startsWith("sym:")) {
+                    JOptionPane.showMessageDialog(this, "Error while parsing sym line: \"" + line + "\"", "Parsing error", JOptionPane.ERROR_MESSAGE);
                 }
-                pinTableModel.getPinToSymbol().put(currentPinCount, line.trim().substring("sym: ".length()).trim());
+                line = line.substring("sym:".length()).trim();
+                if (line.startsWith("\"") && line.endsWith("\"")) {
+                    line = line.substring(1, line.length());
+                }
+                pinTableModel.getPinToSymbol().put(currentPinCount, line);
                 //Parse the description
-                line = in.readLine().trim();
-                if(line == null || !line.startsWith("description: ")) {
+                do {
+                    line = in.readLine().trim();
+                } while (line != null && line.isEmpty());
+                if (line == null || !line.startsWith("desc:")) {
                     JOptionPane.showMessageDialog(this, "Error while parsing description line: " + line, "Parsing error", JOptionPane.ERROR_MESSAGE);
                 }
-                pinTableModel.getPinToDescription().put(currentPinCount, line.trim().substring("description: ".length()).trim());
-            } else if (line.trim().startsWith("- param: ")) {
-                String pincountString = line.trim().substring("-  num: ".length()).trim();
-                int currentPinCount = Integer.parseInt(pincountString);
+                line = line.substring("desc:".length()).trim();
+                if (line.startsWith("\"") && line.endsWith("\"")) {
+                    line = line.substring(1, line.length());
+                }
+                pinTableModel.getPinToDescription().put(currentPinCount, line);
+            } else if (line.trim().startsWith("- param:")) {
+                String param = line.trim().substring("- param:".length()).trim();
                 //Parse the symbol
-                line = in.readLine().trim();
-                if(line == null || !line.startsWith("sym: ")) {
-                    JOptionPane.showMessageDialog(this, "Error while parsing sym line: " + line, "Parsing error", JOptionPane.ERROR_MESSAGE);
+                do {
+                    line = in.readLine().trim();
+                } while (line != null && line.isEmpty());
+                if (line == null || !line.startsWith("val:")) {
+                    JOptionPane.showMessageDialog(this, "Error while parsing value line: " + line, "Parsing error", JOptionPane.ERROR_MESSAGE);
                 }
-                pinTableModel.getPinToSymbol().put(currentPinCount, line.trim().substring("sym: ".length()).trim());
+                line = line.substring("val:".length()).trim();
+                if (line.startsWith("\"") && line.endsWith("\"")) {
+                    line = line.substring(1, line.length());
+                }
+                String value = line;
                 //Parse the description
-                line = in.readLine().trim();
-                if(line == null || !line.startsWith("description: ")) {
-                    JOptionPane.showMessageDialog(this, "Error while parsing description line: " + line, "Parsing error", JOptionPane.ERROR_MESSAGE);
+                do {
+                    line = in.readLine().trim();
+                } while (line != null && line.isEmpty());
+                if (line == null || !line.startsWith("unit:")) {
+                    JOptionPane.showMessageDialog(this, "Error while parsing unit line: " + line, "Parsing error", JOptionPane.ERROR_MESSAGE);
                 }
-                pinTableModel.getPinToDescription().put(currentPinCount, line.trim().substring("description: ".length()).trim());
+                line = line.substring("unit:".length()).trim();
+                if (line.startsWith("\"") && line.endsWith("\"")) {
+                    line = line.substring(1, line.length());
+                }
+                String unit = line;
+                //Insert the specification
+                specsTableModel.addSpecification(param, value, unit);
+            } else if (line.startsWith("notes:")) {
+                while ((line = in.readLine()) != null) {
+                    if (!line.trim().startsWith("-")) {
+                        break; //Stop parsing notes
+                    }
+                    line = line.trim().substring("-".length());
+                    if (line.startsWith("\"") && line.endsWith("\"")) {
+                        line = line.substring(1, line.length());
+                    }
+                    notesTableModel.addNote(line);
+                }
             }
         }
+        disableYAMLRebuild = false;
     }
 
     private String pinsToYAML() {
@@ -245,7 +321,7 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
         pinsScrollPane = new javax.swing.JScrollPane();
         pinsTable = new javax.swing.JTable();
         pinsLabel = new javax.swing.JLabel();
-        pinsSpinner = new uli.chipdbeditor.NumberSpinner();
+        pinsSpinner = new com.github.ulikoehler.chipdbeditor.NumberSpinner();
         specsPanel = new javax.swing.JPanel();
         specsScrollPane = new javax.swing.JScrollPane();
         specsTable = new javax.swing.JTable();
@@ -391,7 +467,6 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
         );
 
         yamlField.setColumns(20);
-        yamlField.setEditable(false);
         yamlField.setRows(5);
         yamlScrollPane.setViewportView(yamlField);
 
@@ -554,7 +629,7 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
     private javax.swing.JLabel pinsLabel;
     private javax.swing.JPanel pinsPanel;
     private javax.swing.JScrollPane pinsScrollPane;
-    private uli.chipdbeditor.NumberSpinner pinsSpinner;
+    private com.github.ulikoehler.chipdbeditor.NumberSpinner pinsSpinner;
     private javax.swing.JTable pinsTable;
     private javax.swing.JPanel specsPanel;
     private javax.swing.JScrollPane specsScrollPane;

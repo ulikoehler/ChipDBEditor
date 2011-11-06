@@ -179,7 +179,7 @@
             <Property name="text" type="java.lang.String" value="Number of pins:"/>
           </Properties>
         </Component>
-        <Component class="uli.chipdbeditor.NumberSpinner" name="pinsSpinner">
+        <Component class="com.github.ulikoehler.chipdbeditor.NumberSpinner" name="pinsSpinner">
           <Properties>
             <Property name="intValue" type="int" value="8"/>
           </Properties>
@@ -311,7 +311,6 @@
         <Component class="javax.swing.JTextArea" name="yamlField">
           <Properties>
             <Property name="columns" type="int" value="20"/>
-            <Property name="editable" type="boolean" value="false"/>
             <Property name="rows" type="int" value="5"/>
           </Properties>
         </Component>

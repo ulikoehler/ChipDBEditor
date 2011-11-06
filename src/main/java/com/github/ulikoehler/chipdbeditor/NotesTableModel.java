@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uli.chipdbeditor;
+package com.github.ulikoehler.chipdbeditor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,46 +12,33 @@ import javax.swing.table.AbstractTableModel;
  *
  * @author uli
  */
-public class SpecsTableModel extends AbstractTableModel {
+public class NotesTableModel extends AbstractTableModel {
 
-    private Map<Integer, String> parameterById = new HashMap<Integer, String>();
-    private Map<Integer, String> valueById = new HashMap<Integer, String>();
-    private Map<Integer, String> unitById = new HashMap<Integer, String>();
+    private Map<Integer, String> notes = new HashMap<Integer, String>();
     
-    public void addSpecification(String parameter, String value, String unit) {
-        
+    public void addNote(String note) {
+        int index = getRowCount() - 1;
+        notes.put(index, note);
+        fireTableRowsInserted(index, index);
     }
 
-    public Map<Integer, String> getParameterById() {
-        return parameterById;
-    }
 
-    public Map<Integer, String> getUnitById() {
-        return unitById;
+    public Map<Integer, String> getNotes() {
+        return notes;
     }
-
-    public Map<Integer, String> getValueById() {
-        return valueById;
-    }
-
-    
 
     public int getRowCount() {
-        return Math.max(Math.max(parameterById.size(), valueById.size()), unitById.size()) + 1;
+        return notes.size() + 1;
     }
 
     public int getColumnCount() {
-        return 3;
+        return 1;
     }
 
     @Override
     public String getColumnName(int column) {
         if (column == 0) {
-            return "Parameter";
-        } else if (column == 1) {
-            return "Value";
-        } else if (column == 2) {
-            return "Unit";
+            return "Note";
         } else {
             throw new IllegalArgumentException("Illegal column nr: " + column);
         }
@@ -59,13 +46,7 @@ public class SpecsTableModel extends AbstractTableModel {
 
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (columnIndex == 0) {
-            return parameterById.get(rowIndex);
-        } else if (columnIndex == 1) {
-            //Symbol
-            return valueById.get(rowIndex);
-        } else if (columnIndex == 2) {
-            //Description
-            return unitById.get(rowIndex);
+            return notes.get(rowIndex);
         } else {
             throw new IllegalArgumentException("Illegal column nr: " + columnIndex);
         }
@@ -85,20 +66,16 @@ public class SpecsTableModel extends AbstractTableModel {
                 addNewRow = true;
             }
         }
-
+        
         String attribute = null;
-        if (aValue instanceof JLabelWithAttribute) {
+        if(aValue instanceof JLabelWithAttribute) {
             attribute = ((JLabelWithAttribute) aValue).getAttribute().toString();
         } else {
             attribute = aValue.toString();
         }
 
         if (columnIndex == 0) {
-            parameterById.put(rowIndex, attribute);
-        } else if (columnIndex == 1) {
-            valueById.put(rowIndex, attribute);
-        } else if (columnIndex == 2) {
-            unitById.put(rowIndex, attribute);
+            notes.put(rowIndex, attribute);
         } else {
             throw new IllegalArgumentException("Illegal column nr: " + columnIndex);
         }

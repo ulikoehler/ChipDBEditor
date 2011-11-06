@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uli.chipdbeditor;
+package com.github.ulikoehler.chipdbeditor;
 
 import java.awt.Component;
 import javax.swing.JTable;
