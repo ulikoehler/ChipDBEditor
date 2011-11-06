@@ -16,6 +16,10 @@ public class NotesTableModel extends AbstractTableModel {
 
     private Map<Integer, String> notes = new HashMap<Integer, String>();
     
+    public void clear() {
+        notes.clear();
+    }
+    
     public void addNote(String note) {
         int index = getRowCount() - 1;
         notes.put(index, note);

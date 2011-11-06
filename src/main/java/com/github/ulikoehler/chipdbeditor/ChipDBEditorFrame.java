@@ -183,6 +183,9 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
         if (disableYAMLParsing) {
             return;
         }
+        //Remove any old data
+        notesTableModel.clear();
+        specsTableModel.clear();
         disableYAMLRebuild = true;
         BufferedReader in = new BufferedReader(new StringReader(yaml));
         String line = null;

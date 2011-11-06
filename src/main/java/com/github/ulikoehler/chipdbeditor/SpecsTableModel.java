@@ -17,6 +17,12 @@ public class SpecsTableModel extends AbstractTableModel {
     private Map<Integer, String> parameterById = new HashMap<Integer, String>();
     private Map<Integer, String> valueById = new HashMap<Integer, String>();
     private Map<Integer, String> unitById = new HashMap<Integer, String>();
+    
+    public void clear() {
+        parameterById.clear();
+        valueById.clear();
+        unitById.clear();
+    }
 
     public void addSpecification(String parameter, String value, String unit) {
         int index = getRowCount() - 1;
