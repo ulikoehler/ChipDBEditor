@@ -13,9 +13,21 @@ import javax.swing.table.AbstractTableModel;
  * @author uli
  */
 class PinTableModel extends AbstractTableModel {
+
     private int numPins = 8;
     private Map<Integer, String> pinToSymbol = new HashMap<Integer, String>();
     private Map<Integer, String> pinToDescription = new HashMap<Integer, String>();
+
+    /**
+     * Adds a specific pin dataset (replaces without asking) and re-renders the
+     * corresponding row
+     */
+    public void addPinData(int number, String symbol, String description) {
+        System.out.println("addPinData " + number);
+        pinToSymbol.put(number, symbol);
+        pinToDescription.put(number, description);
+        fireTableRowsUpdated(number - 1, number - 1); //Re-render it
+    }
 
     public Map<Integer, String> getPinToDescription() {
         return pinToDescription;
@@ -27,14 +39,12 @@ class PinTableModel extends AbstractTableModel {
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        if(columnIndex == 0) {
+        if (columnIndex == 0) {
             return String.class;
         } else {
             return JLabelWithAttribute.class;
         }
     }
-    
-    
 
     public void setNumPins(int newNumPins) {
         int oldNumPins = this.numPins;
@@ -72,7 +82,6 @@ class PinTableModel extends AbstractTableModel {
         return !(columnIndex == 0); //Pin number is NOT editable, everything else is
     }
 
-
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (columnIndex == 0) {
             return "" + (rowIndex + 1); //Pin number
@@ -90,7 +99,7 @@ class PinTableModel extends AbstractTableModel {
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         String attribute = null;
-        if(aValue instanceof JLabelWithAttribute) {
+        if (aValue instanceof JLabelWithAttribute) {
             attribute = ((JLabelWithAttribute) aValue).getAttribute().toString();
         } else {
             attribute = aValue.toString();
@@ -108,5 +117,4 @@ class PinTableModel extends AbstractTableModel {
         }
         fireTableDataChanged();
     }
-    
 }

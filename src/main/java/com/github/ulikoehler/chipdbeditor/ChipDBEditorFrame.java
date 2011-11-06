@@ -30,7 +30,7 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
     private NotesTableModel notesTableModel = new NotesTableModel();
     private boolean disableYAMLParsing = false; //Avoid parsing the YAML because of setting the field content when recalculating it
     private boolean disableYAMLRebuild = false; //Avoid rebuilding the YAML when parsing it
-
+    
     private void initPinsTable() {
         pinsTable.setModel(pinTableModel);
         pinsTable.setRowHeight(25);
@@ -178,42 +178,42 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
         BufferedReader in = new BufferedReader(new StringReader(yaml));
         String line = null;
         while ((line = in.readLine()) != null) {
-            if (line.startsWith("name: ")) {
-                String name = line.substring("name: ".length()).trim();
+            if (line.startsWith("name:")) {
+                String name = line.substring("name:".length()).trim();
                 if (name.startsWith("\"") && name.endsWith("\"")) {
-                    name = name.substring(1, name.length());
+                    name = name.substring(1, name.length()-1);
                 }
                 partField.setText(name);
-            } else if (line.startsWith("description: ")) {
-                String description = line.substring("description: ".length()).trim();
+            } else if (line.startsWith("description:")) {
+                String description = line.substring("description:".length()).trim();
                 if (description.startsWith("\"") && description.endsWith("\"")) {
-                    description = description.substring(1, description.length());
+                    description = description.substring(1, description.length()-1);
                 }
                 descriptionField.setText(description);
-            } else if (line.startsWith("family: ")) {
-                String family = line.substring("family: ".length()).trim();
+            } else if (line.startsWith("family:")) {
+                String family = line.substring("family:".length()).trim();
                 if (family.startsWith("\"") && family.endsWith("\"")) {
-                    family = family.substring(1, family.length());
+                    family = family.substring(1, family.length()-1);
                 }
                 familyField.setText(family);
-            } else if (line.startsWith("datasheet: ")) {
-                String family = line.substring("datasheet: ".length()).trim();
-                if (family.startsWith("\"") && family.endsWith("\"")) {
-                    family = family.substring(1, family.length());
+            } else if (line.startsWith("datasheet:")) {
+                String datasheet = line.substring("datasheet:".length()).trim();
+                if (datasheet.startsWith("\"") && datasheet.endsWith("\"")) {
+                    datasheet = datasheet.substring(1, datasheet.length()-1);
                 }
-                familyField.setText(family);
-            } else if (line.startsWith("aliases: ")) {
-                String aliases = line.substring("aliases: ".length()).trim();
+                familyField.setText(datasheet);
+            } else if (line.startsWith("aliases:")) {
+                String aliases = line.substring("aliases:".length()).trim();
                 if (aliases.startsWith("[") && aliases.endsWith("]")) {
-                    aliases = aliases.substring(1, aliases.length());
+                    aliases = aliases.substring(1, aliases.length()-1);
                 }
                 aliasesField.setText(aliases);
-            } else if (line.startsWith("pincount: ")) {
-                String pincountString = line.substring("pincount: ".length()).trim();
+            } else if (line.startsWith("pincount:")) {
+                String pincountString = line.substring("pincount:".length()).trim();
                 int pincountInt = Integer.parseInt(pincountString);
                 pinsSpinner.setIntValue(pincountInt);
             } else if (line.trim().startsWith("- num:")) {
-                String pincountString = line.trim().substring("-  num:".length()).trim();
+                String pincountString = line.trim().substring("- num:".length()).trim();
                 int currentPinCount = Integer.parseInt(pincountString);
                 //Parse the symbol
                 do {
@@ -226,7 +226,7 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
                 if (line.startsWith("\"") && line.endsWith("\"")) {
                     line = line.substring(1, line.length());
                 }
-                pinTableModel.getPinToSymbol().put(currentPinCount, line);
+                String symbol = line;
                 //Parse the description
                 do {
                     line = in.readLine().trim();
@@ -238,7 +238,9 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
                 if (line.startsWith("\"") && line.endsWith("\"")) {
                     line = line.substring(1, line.length());
                 }
-                pinTableModel.getPinToDescription().put(currentPinCount, line);
+                String description = line;
+                //Insert the data and re-render the table row
+                pinTableModel.addPinData(currentPinCount, symbol, description);
             } else if (line.trim().startsWith("- param:")) {
                 String param = line.trim().substring("- param:".length()).trim();
                 //Parse the symbol
