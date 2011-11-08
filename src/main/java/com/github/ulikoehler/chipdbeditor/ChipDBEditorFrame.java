@@ -298,7 +298,7 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
                     }
                     line = line.trim().substring("-".length());
                     if (line.startsWith("\"") && line.endsWith("\"")) {
-                        line = line.substring(1, line.length());
+                        line = line.substring(1, line.length() - 1);
                     }
                     notesTableModel.addNote(line);
                 }

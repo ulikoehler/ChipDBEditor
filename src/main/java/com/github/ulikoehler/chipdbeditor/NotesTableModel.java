@@ -50,7 +50,7 @@ public class NotesTableModel extends AbstractTableModel {
 
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (columnIndex == 0) {
-            return notes.get(rowIndex + 1);
+            return notes.get(rowIndex+1);
         } else {
             throw new IllegalArgumentException("Illegal column nr: " + columnIndex);
         }
