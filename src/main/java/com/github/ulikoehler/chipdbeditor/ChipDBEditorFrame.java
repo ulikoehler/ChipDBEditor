@@ -320,7 +320,7 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
             String description = pinToDescription.get(i);
             yamlBuilder.append("  - num: ").append(i).append('\n');
             yamlBuilder.append("    sym: ").append(symbol == null ? "" : symbol).append('\n');
-            yamlBuilder.append("    dessc: ").append(description == null ? "" : description).append('\n');
+            yamlBuilder.append("    desc: ").append(description == null ? "" : description).append('\n');
         }
         return yamlBuilder.toString();
     }
