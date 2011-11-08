@@ -164,12 +164,11 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
         Map<Integer, String> paramById = specsTableModel.getParameterById();
         Map<Integer, String> unitById = specsTableModel.getUnitById();
         Map<Integer, String> valueById = specsTableModel.getValueById();
-        for (int i = 1; i <= numPins; i++) {
+        for (int i = 0; i <= numPins; i++) {
             String param = paramById.get(i) == null ? "" : paramById.get(i);
             String unit = unitById.get(i) == null ? "" : unitById.get(i);
             String value = valueById.get(i) == null ? "" : valueById.get(i);
             if (param.trim().isEmpty() && unit.trim().isEmpty() && value.trim().isEmpty()) {
-                System.out.println("Continue ");
                 continue; //Don't add empty specs
             }
             yamlBuilder.append("  - param: \"").append(param).append("\"\n");
