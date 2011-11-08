@@ -23,7 +23,6 @@ class PinTableModel extends AbstractTableModel {
      * corresponding row
      */
     public void addPinData(int number, String symbol, String description) {
-        System.out.println("addPinData " + number);
         pinToSymbol.put(number, symbol);
         pinToDescription.put(number, description);
         fireTableRowsUpdated(number - 1, number - 1); //Re-render it

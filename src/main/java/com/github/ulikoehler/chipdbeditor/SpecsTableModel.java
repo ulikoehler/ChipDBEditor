@@ -67,13 +67,13 @@ public class SpecsTableModel extends AbstractTableModel {
 
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (columnIndex == 0) {
-            return parameterById.get(rowIndex + 1);
+            return parameterById.get(rowIndex);
         } else if (columnIndex == 1) {
             //Symbol
-            return valueById.get(rowIndex + 1);
+            return valueById.get(rowIndex);
         } else if (columnIndex == 2) {
             //Description
-            return unitById.get(rowIndex + 1);
+            return unitById.get(rowIndex);
         } else {
             throw new IllegalArgumentException("Illegal column nr: " + columnIndex);
         }
@@ -102,11 +102,11 @@ public class SpecsTableModel extends AbstractTableModel {
         }
 
         if (columnIndex == 0) {
-            parameterById.put(rowIndex + 1, attribute);
+            parameterById.put(rowIndex, attribute);
         } else if (columnIndex == 1) {
-            valueById.put(rowIndex + 1, attribute);
+            valueById.put(rowIndex, attribute);
         } else if (columnIndex == 2) {
-            unitById.put(rowIndex + 1, attribute);
+            unitById.put(rowIndex, attribute);
         } else {
             throw new IllegalArgumentException("Illegal column nr: " + columnIndex);
         }

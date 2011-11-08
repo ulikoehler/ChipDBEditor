@@ -14,7 +14,7 @@ import javax.swing.table.AbstractTableModel;
  */
 public class NotesTableModel extends AbstractTableModel {
 
-    private Map<Integer, String> notes = new HashMap<Integer, String>();
+    private Map<Integer, String> notes = new HashMap<Integer, String>(); //First value: key = 0
     
     public void clear() {
         notes.clear();
@@ -22,6 +22,7 @@ public class NotesTableModel extends AbstractTableModel {
     
     public void addNote(String note) {
         int index = getRowCount() - 1;
+        System.out.println("inde" + index);
         notes.put(index, note);
         fireTableRowsInserted(index-1, index-1);
     }
@@ -50,7 +51,7 @@ public class NotesTableModel extends AbstractTableModel {
 
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (columnIndex == 0) {
-            return notes.get(rowIndex+1);
+            return notes.get(rowIndex);
         } else {
             throw new IllegalArgumentException("Illegal column nr: " + columnIndex);
         }
@@ -79,7 +80,7 @@ public class NotesTableModel extends AbstractTableModel {
         }
 
         if (columnIndex == 0) {
-            notes.put(rowIndex + 1, attribute);
+            notes.put(rowIndex, attribute);
         } else {
             throw new IllegalArgumentException("Illegal column nr: " + columnIndex);
         }

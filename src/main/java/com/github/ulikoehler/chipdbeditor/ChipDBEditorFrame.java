@@ -236,7 +236,8 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
                 //Parse the symbol
                 do {
                     line = in.readLine().trim();
-                } while (line != null && line.isEmpty());
+                } while (line.isEmpty());
+                //Check if the next line contains the symbol
                 if (line == null || !line.startsWith("sym:")) {
                     JOptionPane.showMessageDialog(this, "Error while parsing sym line: \"" + line + "\"", "Parsing error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -248,7 +249,8 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
                 //Parse the description
                 do {
                     line = in.readLine().trim();
-                } while (line != null && line.isEmpty());
+                } while (line.isEmpty());
+                //Check if the next line contains the description
                 if (line == null || !line.startsWith("desc:")) {
                     JOptionPane.showMessageDialog(this, "Error while parsing description line: " + line, "Parsing error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -260,15 +262,16 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
                 //Insert the data and re-render the table row
                 pinTableModel.addPinData(currentPinCount, symbol, description);
             } else if (line.trim().startsWith("- param:")) {
-                line =  line.trim().substring("- param:".length()).trim();
+                line = line.trim().substring("- param:".length()).trim();
                 if (line.startsWith("\"") && line.endsWith("\"")) {
                     line = line.substring(1, line.length() - 1);
                 }
                 String param = line;
+                System.out.println(param);
                 //Parse the symbol
                 do {
                     line = in.readLine().trim();
-                } while (line != null && line.isEmpty());
+                } while (line == null || line.isEmpty());
                 if (line == null || !line.startsWith("val:")) {
                     JOptionPane.showMessageDialog(this, "Error while parsing value line: " + line, "Parsing error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -280,7 +283,7 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
                 //Parse the description
                 do {
                     line = in.readLine().trim();
-                } while (line != null && line.isEmpty());
+                } while (line.isEmpty());
                 if (line == null || !line.startsWith("unit:")) {
                     JOptionPane.showMessageDialog(this, "Error while parsing unit line: " + line, "Parsing error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -296,7 +299,7 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
                     if (!line.trim().startsWith("-")) {
                         break; //Stop parsing notes
                     }
-                    line = line.trim().substring("-".length());
+                    line = line.trim().substring("-".length()).trim();
                     if (line.startsWith("\"") && line.endsWith("\"")) {
                         line = line.substring(1, line.length() - 1);
                     }
@@ -317,7 +320,7 @@ public class ChipDBEditorFrame extends javax.swing.JFrame {
             String description = pinToDescription.get(i);
             yamlBuilder.append("  - num: ").append(i).append('\n');
             yamlBuilder.append("    sym: ").append(symbol == null ? "" : symbol).append('\n');
-            yamlBuilder.append("    desc: ").append(description == null ? "" : description).append('\n');
+            yamlBuilder.append("    dessc: ").append(description == null ? "" : description).append('\n');
         }
         return yamlBuilder.toString();
     }
